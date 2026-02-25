@@ -100,7 +100,7 @@ function App() {
         )}
 
         <div className="info-box">
-          <strong>How it works:Automation tis this working sdf</strong> Upload PDF, Word, Text, or Markdown files. The system
+          <strong>How it works:</strong> Upload PDF, Word, Text, or Markdown files. The system
           chunks your documents and uses keyword-based vector search to find relevant context,
           then sends it to the <strong>Groq API</strong> (<code>{health?.llmModel || 'llama3-8b-8192'}</code>) to generate an answer.
         </div>
