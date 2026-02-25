@@ -60,7 +60,7 @@ function App() {
   }
 
   async function handleClear() {
-    if (!window.confirm('Delete all documents from the vector database?')) return;
+    if (!window.confirm('Delete all documents from the vector database auto deploy?')) return;
 
     try {
       const response = await fetch(`${API_BASE}/clear`, { method: 'POST' });
