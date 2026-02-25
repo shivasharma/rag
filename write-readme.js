@@ -1,4 +1,6 @@
-# RAG System - Document Q&A
+import { writeFileSync } from 'fs';
+
+const content = `# RAG System - Document Q&A
 
 A full-stack Retrieval-Augmented Generation (RAG) application that lets you upload documents and ask questions about their content. Powered by [Groq API](https://console.groq.com) for fast, cloud-based LLM inference.
 
@@ -39,7 +41,7 @@ A full-stack Retrieval-Augmented Generation (RAG) application that lets you uplo
 
 ### Setup
 
-```bash
+\`\`\`bash
 # Clone the repo
 git clone https://github.com/shivasharma/rag.git
 cd rag
@@ -50,17 +52,17 @@ npm run install:all
 # Create the server environment file
 cp server/.env.example server/.env
 # Edit server/.env and add your GROQ_API_KEY
-```
+\`\`\`
 
 ### Run
 
-```bash
+\`\`\`bash
 # Start the backend (port 5000)
 npm run dev:server
 
 # Start the frontend (port 3000)
 npm run dev:client
-```
+\`\`\`
 
 Open http://localhost:3000
 
@@ -68,20 +70,20 @@ Open http://localhost:3000
 
 ## Environment Variables
 
-Create `server/.env` based on `server/.env.example`:
+Create \`server/.env\` based on \`server/.env.example\`:
 
 | Variable | Description |
 |---|---|
-| `GROQ_API_KEY` | Your Groq API key |
-| `GROQ_MODEL` | Model to use (e.g. `llama-3.3-70b-versatile`) |
-| `PORT` | Express server port (default: `5000`) |
-| `NODE_ENV` | Set to `production` on the server |
+| \`GROQ_API_KEY\` | Your Groq API key |
+| \`GROQ_MODEL\` | Model to use (e.g. \`llama-3.3-70b-versatile\`) |
+| \`PORT\` | Express server port (default: \`5000\`) |
+| \`NODE_ENV\` | Set to \`production\` on the server |
 
 ---
 
 ## Project Structure
 
-```
+\`\`\`
 rag-nodejs/
 ├── client/                 # React frontend
 │   ├── src/
@@ -97,7 +99,7 @@ rag-nodejs/
 │   └── server.js
 └── .github/workflows/
     └── deploy.yml          # CI/CD pipeline
-```
+\`\`\`
 
 ---
 
@@ -105,15 +107,15 @@ rag-nodejs/
 
 ### Build
 
-```bash
+\`\`\`bash
 npm run build
-```
+\`\`\`
 
-Outputs to `client/dist/`.
+Outputs to \`client/dist/\`.
 
 ### Nginx config
 
-```nginx
+\`\`\`nginx
 location /project {
     alias /var/www/rag-nodejs/client/dist;
     try_files $uri $uri/ /project/index.html;
@@ -125,29 +127,29 @@ location /api {
     proxy_set_header Host $host;
     proxy_set_header X-Real-IP $remote_addr;
 }
-```
+\`\`\`
 
 ### Start server
 
-```bash
+\`\`\`bash
 cd server
 pm2 start server.js --name rag-api
 pm2 save
-```
+\`\`\`
 
 ---
 
 ## CI/CD
 
-Pushing to `main` automatically deploys to the VPS via GitHub Actions.
+Pushing to \`main\` automatically deploys to the VPS via GitHub Actions.
 
 **Required GitHub secrets:**
 
 | Secret | Value |
 |---|---|
-| `VPS_HOST` | VPS IP address |
-| `VPS_USER` | SSH username |
-| `VPS_SSH_KEY` | Private SSH key |
+| \`VPS_HOST\` | VPS IP address |
+| \`VPS_USER\` | SSH username |
+| \`VPS_SSH_KEY\` | Private SSH key |
 
 The workflow pulls the latest code, rebuilds the frontend, and restarts PM2.
 
@@ -156,3 +158,7 @@ The workflow pulls the latest code, rebuilds the frontend, and restarts PM2.
 ## License
 
 MIT
+`;
+
+writeFileSync('README.md', content);
+console.log('README.md written successfully');
