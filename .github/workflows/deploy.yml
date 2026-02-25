@@ -1,0 +1,39 @@
+name: Deploy to VPS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to VPS via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            cd /var/www/rag-nodejs
+
+            # Pull latest code
+            git pull origin main
+
+            # Install server dependencies
+            npm install --prefix server --omit=dev
+
+            # Build client
+            npm install --prefix client
+            npm run build --prefix client
+
+            # Fix permissions
+            chown -R www-data:www-data /var/www/rag-nodejs/client/dist
+            chmod -R 755 /var/www/rag-nodejs/client/dist
+
+            # Restart Express server
+            pm2 restart rag-api
+
+            echo "Deployment complete"
