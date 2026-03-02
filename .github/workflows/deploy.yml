@@ -17,22 +17,25 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
+            # Ensure directory exists
+            mkdir -p /var/www/rag-nodejs
             cd /var/www/rag-nodejs
 
-            # Pull latest code
-            git pull origin main
+            # Clone if first time, pull if exists
+            if [ ! -d .git ]; then
+              git clone https://github.com/shivasharma/rag.git .
+            else
+              git pull origin main
+            fi
 
-            # Install server dependencies
+            # Install and build
             npm install --prefix server --omit=dev
-
-            # Build client
             npm install --prefix client
             npm run build --prefix client
-            echo "Build output:"
-            ls -la /var/www/rag-nodejs/client/
+
             # Fix permissions
-            chown -R www-data:www-data /var/www/rag-nodejs/client/dist
-            chmod -R 755 /var/www/rag-nodejs/client/dist
+            sudo chown -R www-data:www-data /var/www/rag-nodejs/client/dist
+            sudo chmod -R 755 /var/www/rag-nodejs/client/dist
 
             # Restart Express server
             pm2 restart rag-api
