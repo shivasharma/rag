@@ -28,7 +28,8 @@ jobs:
             # Build client
             npm install --prefix client
             npm run build --prefix client
-
+            echo "Build output:"
+            ls -la /var/www/rag-nodejs/client/
             # Fix permissions
             chown -R www-data:www-data /var/www/rag-nodejs/client/dist
             chmod -R 755 /var/www/rag-nodejs/client/dist
