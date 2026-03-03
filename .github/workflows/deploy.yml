@@ -1,39 +1,43 @@
+name: Deploy to VPS
+
+on:
+  push:
+    branches:
+      - main
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      # 1. Build the client
-      - name: Build Client
-        run: |
-          cd client
-          npm install
-          npm run build
-
-      # 2. Copy to VPS
-      - name: Copy files to VPS
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.VPS_SSH_KEY }}
-          source: "client/dist,server,package.json" # Add files you need
-          target: "/var/www/rag-nodejs"
-
-      # 3. Finalize on server
-      - name: Restart App
+      - name: Deploy to VPS via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
+            # Ensure directory exists
+            mkdir -p /var/www/rag-nodejs
             cd /var/www/rag-nodejs
-            npm install --prefix server --production
+
+            # Clone if first time, pull if exists
+            if [ ! -d .git ]; then
+              git clone https://github.com/shivasharma/rag.git .
+            else
+              git pull origin main
+            fi
+
+            # Install and build
+            npm install --prefix server --omit=dev
+            npm install --prefix client
+            npm run build --prefix client
+
+            # Fix permissions
+            sudo chown -R www-data:www-data /var/www/rag-nodejs/client/dist
+            sudo chmod -R 755 /var/www/rag-nodejs/client/dist
+
+            # Restart Express server
             pm2 restart rag-api
+
+            echo "Deployment complete"
