@@ -114,16 +114,26 @@ Outputs to `client/dist/`.
 ### Nginx config
 
 ```nginx
-location /project {
-    alias /var/www/rag-nodejs/client/dist;
-    try_files $uri $uri/ /project/index.html;
-}
+server {
+    listen 80;
+    server_name your_domain_or_ip;
 
-location /api {
-    proxy_pass http://localhost:5000;
-    proxy_http_version 1.1;
-    proxy_set_header Host $host;
-    proxy_set_header X-Real-IP $remote_addr;
+    # Frontend - The React Build
+    location / {
+        root /var/www/rag-nodejs/client/dist;
+        index index.html;
+        try_files $uri $uri/ /project/index.html;
+    }
+
+    # Backend - The Express API
+    location /api/ {
+        proxy_pass http://localhost:5000; # Match your Express port
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+    }
 }
 ```
 
